@@ -1,25 +1,27 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../routes/ProtectedRoute';
+import TenantProtectedRoute from '../routes/TenantProtectedRoute';
 
 // Public Pages
 import Home from '../pages/Home';
-import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import AdminLogin from '../pages/Admin/AdminLogin';
 import PropertyDetails from '../pages/Properties/PropertyDetails';
 import PropertyMapPage from '../pages/PropertyMapPage';
 import AllPropertiesPage from '../pages/AllPropertiesPage';
 import FAQ from '../pages/FAQ';
-// import MainLayout from '../components/Layout/common/MainLayout';
-
-
+import MainLayout from '../components/Layout/MainLayout';
 
 // Tenant Pages
-import TenantDashboard from '../pages/Tenant/TenantDashboard';
+import TenantHome from '../pages/Tenant/TenantHome';
+import TenantPropertyDetails from '../pages/Tenant/TenantPropertyDetails';
+import TenantProfile from '../pages/Tenant/TenantProfile';
 import MyBookings from '../pages/Tenant/MyBookings';
 import MyWishlist from '../pages/Tenant/MyWishlist';
 import PaymentPage from '../pages/Tenant/PaymentPage';
+import PaymentHistoryPlaceholder from '../pages/Tenant/PaymentHistoryPlaceholder';
+import ChangePassword from '../pages/Tenant/ChangePassword';
 
 
 // Owner Pages
@@ -36,35 +38,35 @@ import AdminDeletedProperties from '../pages/Admin/AdminDeletedProperties';
 import AdminSettings from '../pages/Admin/AdminSettings';
 import PaymentVerification from '../pages/Admin/PaymentVerification';
 
+import Login from '../components/Auth/Login';
+
 const AppRoutes = () => {
   
   return (
     <Routes>
       {/* ================== PUBLIC ROUTES ================== */}
-      
-      {/* <Route element={<MainLayout />} /> */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/properties/:id" element={<PropertyDetails />} />
+        <Route path="/allproperties" element={<AllPropertiesPage />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Route>
+
       <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/properties/:id" element={<PropertyDetails />} />
       <Route path="/properties/:id/map" element={<PropertyMapPage />} />
-<Route path="/allproperties" element={<AllPropertiesPage />} />
-<Route path="/faq" element={<FAQ />} />
-
-
-
-
-
 
       {/* ================== TENANT ROUTES ================== */}
-      <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
-        <Route path="/tenant/dashboard" element={<TenantDashboard />} />
-        <Route path="/tenant/bookings" element={<MyBookings />} />
-        <Route path="/tenant/wishlist" element={<MyWishlist />} />
-        <Route path="/tenant/properties" element={<Home />} />
-        <Route path="/tenant/payment/:bookingId" element={<PaymentPage />} />
-
+      <Route path="/tenant" element={<TenantProtectedRoute />}> 
+        <Route index element={<TenantHome />} />
+        <Route path="profile" element={<TenantProfile />} />
+        <Route path="bookings" element={<MyBookings />} />
+        <Route path="wishlist" element={<MyWishlist />} />
+        <Route path="payments" element={<PaymentHistoryPlaceholder />} />
+        <Route path="property/:id" element={<TenantPropertyDetails />} />
+        <Route path="payment/:bookingId" element={<PaymentPage />} />
+        <Route path="change-password" element={<ChangePassword />} />
       </Route>
 
       {/* ================== OWNER ROUTES ================== */}

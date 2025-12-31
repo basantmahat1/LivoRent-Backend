@@ -68,6 +68,7 @@ const PaymentPage = () => {
       });
       
       setPayment(response.data.payment);
+      
       alert('QR Code generated! Scan to pay within 10 minutes.');
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to generate QR code');
@@ -117,7 +118,7 @@ const PaymentPage = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
@@ -131,7 +132,7 @@ const PaymentPage = () => {
   if (!booking) {
     return (
       <>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2" style={{color: 'var(--color-primary)'}}>Booking Not Found</h2>
@@ -146,7 +147,7 @@ const PaymentPage = () => {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           <button
@@ -284,16 +285,65 @@ const PaymentPage = () => {
                     <p className="text-sm text-gray-600 mt-2">Time remaining to complete payment</p>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                    <div className="flex justify-center mb-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    {/* ========== BACKEND GENERATED QR CODE (COMMENTED OUT) ========== */}
+                    {/* <div className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                      <h3 className="font-bold text-lg mb-4 text-gray-700">Payment QR Code</h3>
                       <img src={payment.qr_code} alt="Payment QR Code" className="w-64 h-64 border-4 border-gray-300 rounded-lg" />
-                    </div>
-                    <div className="text-center space-y-2">
-                      <div className="font-bold text-lg">Platform Account: {payment.platform_account}</div>
-                      <div className="text-sm text-gray-600">Payment ID: {payment.payment_id}</div>
-                      <div className="text-2xl font-bold" style={{color: 'var(--color-accent)'}}>
-                        Amount: ${payment.amount}
+                      <p className="text-sm text-gray-600 mt-4 text-center">Scan this QR code with your {paymentMethod === 'esewa' ? 'eSewa' : 'Khalti'} app</p>
+                    </div> */}
+                    {/* ========== END OF COMMENTED SECTION ========== */}
+
+                    {/* User Details Section */}
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border-2 border-blue-300">
+                      <h3 className="font-bold text-lg mb-4" style={{color: 'var(--color-primary)'}}>Payment Details</h3>
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Tenant Name</div>
+                          <div className="font-bold text-lg">{booking.tenant_name || 'User'}</div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Booking ID</div>
+                          <div className="font-bold text-lg font-mono"># {booking.id}</div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Payment Amount</div>
+                          <div className="text-3xl font-bold" style={{color: 'var(--color-accent)'}}>
+                            Rs {booking.total_price}
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Payment Method</div>
+                          <div className="font-bold text-lg">
+                            {paymentMethod === 'esewa' ? '💚 eSewa' : '💜 Khalti'}
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Platform Account</div>
+                          <div className="font-bold text-sm">{payment.platform_account}</div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-4">
+                          <div className="text-sm text-gray-600 mb-1">Transaction ID</div>
+                          <div className="font-mono text-sm font-semibold text-gray-700">{payment.payment_id}</div>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* User-owned QR (public/qr.jpg) - MAIN QR CODE */}
+                    <div className="bg-gray-50 rounded-lg p-6 flex flex-col items-center justify-center">
+                      <h3 className="font-bold text-lg mb-4 text-gray-700">Payment QR Code</h3>
+                      <img
+                        src="/public/QR_code.webp"
+                        alt="Payment QR Code"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                        className="w-64 h-64 object-contain border-4 border-gray-300 rounded-lg"
+                      />
+                      <p className="text-sm text-gray-600 mt-4 text-center">Scan this QR code with your {paymentMethod === 'esewa' ? 'eSewa' : 'Khalti'} app</p>
                     </div>
                   </div>
 

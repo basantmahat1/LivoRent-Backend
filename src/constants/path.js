@@ -6,6 +6,7 @@ const PATHS = {
   TENANT_PROPERTIES: '/tenant/properties',
   TENANT_BOOKINGS: '/tenant/bookings',
   TENANT_PROFILE: '/tenant/profile',
+  TENANT_CHANGE_PASSWORD: '/tenant/change-password',
   
 
   // Owner Routes

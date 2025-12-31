@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { wishlistAPI } from '../../services/api';
-                import { HeartOutlined, HeartFilled } from "@ant-design/icons";
+import { HeartOutlined, HeartFilled } from "@ant-design/icons";
 
-const PropertyCard = ({ property, onWishlistChange }) => {
-    const { user } = useAuth();
+const PropertyCard = ({ property, onWishlistChange, onCardClick }) => {
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
     const [inWishlist, setInWishlist] = useState(property.inWishlist || false);
     const [loading, setLoading] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -56,21 +57,31 @@ const PropertyCard = ({ property, onWishlistChange }) => {
     }, [images.length]);
 
     const nextImage = (e) => {
-        e?.preventDefault(); e?.stopPropagation();
+        e?.preventDefault(); 
+        e?.stopPropagation();
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
     };
 
     const prevImage = (e) => {
-        e?.preventDefault(); e?.stopPropagation();
+        e?.preventDefault(); 
+        e?.stopPropagation();
         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     };
 
     const handleWishlistToggle = async (e) => {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault(); 
+        e.stopPropagation();
+        
         if (!user || user.role !== 'tenant') {
-            alert('Please login as a tenant to add to wishlist');
+            navigate('/login', { 
+                state: { 
+                    from: `/properties/${property.id}`,
+                    message: 'Please login as a tenant to add to wishlist'
+                } 
+            });
             return;
         }
+        
         setLoading(true);
         try {
             const response = await wishlistAPI.toggle(property.id);
@@ -78,14 +89,19 @@ const PropertyCard = ({ property, onWishlistChange }) => {
             if (onWishlistChange) onWishlistChange(property.id, response.data.inWishlist);
         } catch (error) {
             alert(error.response?.data?.message || 'Failed to update wishlist');
-        } finally { setLoading(false); }
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const handleShare = async (e) => {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault(); 
+        e.stopPropagation();
         const shareUrl = `${window.location.origin}/properties/${property.id}`;
         if (navigator.share) {
-            try { await navigator.share({ title: property.title, url: shareUrl }); } catch (err) {}
+            try { 
+                await navigator.share({ title: property.title, url: shareUrl }); 
+            } catch (err) {}
         } else {
             navigator.clipboard.writeText(shareUrl);
             alert('Link copied!');
@@ -93,25 +109,78 @@ const PropertyCard = ({ property, onWishlistChange }) => {
     };
 
     const handleWhatsAppShare = (e) => {
-        e.preventDefault(); e.stopPropagation();
+        e.preventDefault(); 
+        e.stopPropagation();
         const shareUrl = `${window.location.origin}/properties/${property.id}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(property.title + ' ' + shareUrl)}`, '_blank');
     };
 
+    const handleMapView = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = `/properties/${property.id}/map`;
+    };
+
+    const handleCardClick = (e) => {
+        if (e.target.closest('button')) {
+            return;
+        }
+
+        const propertyUrl = `/properties/${property.id}`;
+        
+        if (!isAuthenticated) {
+            navigate('/login', { 
+                state: { 
+                    from: propertyUrl,
+                    message: 'Please login to view property details'
+                } 
+            });
+        } else {
+            if (typeof onCardClick === 'function') {
+                onCardClick(property);
+            } else {
+                navigate(propertyUrl);
+            }
+        }
+    };
+
+    const handleViewDetails = () => {
+        const propertyUrl = `/properties/${property.id}`;
+        
+        if (!isAuthenticated) {
+            navigate('/login', { 
+                state: { 
+                    from: propertyUrl,
+                    message: 'Please login to view property details'
+                } 
+            });
+        } else {
+            if (typeof onCardClick === 'function') {
+                onCardClick(property);
+            } else {
+                navigate(propertyUrl);
+            }
+        }
+    };
+
     return (
-        <Link
-            to={`/properties/${property.id}`}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 block group"
+        <div
+            onClick={handleCardClick}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 cursor-pointer h-full"
         >
             {/* Image Section */}
-            <div className="relative h-60 overflow-hidden" ref={imageContainerRef}>
+            <div className="relative h-44 overflow-hidden" ref={imageContainerRef}>
                 <div className="relative h-full w-full">
                     {images.map((img, idx) => (
                         <div
                             key={idx}
-                            className={`absolute inset-0 transition-opacity duration-700 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
+                            className={`absolute inset-0 transition-opacity duration-500 ${idx === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
                         >
-                            <img src={img} alt={property.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <img 
+                                src={img} 
+                                alt={property.title} 
+                                className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                            />
                         </div>
                     ))}
                 </div>
@@ -119,71 +188,105 @@ const PropertyCard = ({ property, onWishlistChange }) => {
                 {/* Arrows */}
                 {images.length > 1 && (
                     <>
-                        <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">←</button>
-                        <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">→</button>
+                        <button 
+                            onClick={prevImage} 
+                            className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-black/40 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                        >
+                            ←
+                        </button>
+                        <button 
+                            onClick={nextImage} 
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-black/40 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                        >
+                            →
+                        </button>
                     </>
                 )}
 
-                {/* Badges - Design Consistent with Image */}
-                <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                    <span className="bg-[#00BFA5] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">New Listing</span>
-                    {property.featured && <span className="bg-yellow-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">⭐ Featured</span>}
-                    {property.is_verified && <span className="bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">✅ Verified</span>}
+                {/* Badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    <span className="bg-[#00BFA5] text-white text-[8px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide">
+                        New Listing
+                    </span>
+                    {property.featured && (
+                        <span className="bg-yellow-500 text-white text-[8px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide">
+                            ⭐ Featured
+                        </span>
+                    )}
+                    {property.is_verified && (
+                        <span className="bg-blue-500 text-white text-[8px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide">
+                            ✅ Verified
+                        </span>
+                    )}
                 </div>
 
                 {/* Wishlist */}
-
-
-<button
-  onClick={handleWishlistToggle}
-  disabled={loading}
-  className="absolute top-3 right-3 cursor-pointer transition-transform hover:scale-125"
->
-  {loading ? (
-    '...'
-  ) : inWishlist ? (
-    <HeartFilled style={{ color: '#ff4d4f', fontSize: '24px' }} />
-  ) : (
-    <HeartOutlined style={{ color: '#4B5563', fontSize: '24px' }} />
-  )}
-</button>
-
+                <button
+                    onClick={handleWishlistToggle}
+                    disabled={loading}
+                    className="absolute top-2 right-2 transition-transform hover:scale-110"
+                >
+                    {loading ? (
+                        <span className="text-white text-xs">...</span>
+                    ) : inWishlist ? (
+                        <HeartFilled style={{ color: '#ff4d4f', fontSize: '18px' }} />
+                    ) : (
+                        <HeartOutlined style={{ color: 'white', fontSize: '18px' }} />
+                    )}
+                </button>
                 
                 {/* Dots */}
                 {images.length > 1 && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                         {images.map((_, idx) => (
-                            <div key={idx} className={`h-1.5 rounded-full transition-all ${idx === currentImageIndex ? 'w-4 bg-[#00BFA5]' : 'w-1.5 bg-white/60'}`} />
+                            <div 
+                                key={idx} 
+                                className={`h-1 rounded-full transition-all ${
+                                    idx === currentImageIndex ? 'w-3 bg-[#00BFA5]' : 'w-1 bg-white/70'
+                                }`} 
+                            />
                         ))}
                     </div>
                 )}
             </div>
 
             {/* Content Section */}
-            <div className="p-5">
+            <div className="p-3">
                 <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                        <h3 className="font-bold text-lg text-[#1A2B3C] truncate">{property.title}</h3>
-                        <p className="text-sm text-gray-500 truncate">📍 {property.address}, {property.city}</p>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm text-gray-800 truncate">
+                            {property.title}
+                        </h3>
+                        <p className="text-[10px] text-gray-500 truncate">
+                            📍 {property.address}, {property.city}
+                        </p>
                     </div>
-                    <div className="text-right ml-4">
-                        <span className="font-bold text-xl text-[#00BFA5]">Rs. {property.price.toLocaleString()}</span>
-                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">per month</p>
+                    <div className="text-right ml-2 flex-shrink-0">
+                        <span className="font-bold text-base text-[#00BFA5] block leading-tight">
+                            Rs. {property.price.toLocaleString()}
+                        </span>
+                        <p className="text-[8px] text-gray-400 uppercase font-medium">
+                            per month
+                        </p>
                     </div>
                 </div>
 
                 {/* Property Features */}
-                <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 my-4 py-2 border-y border-gray-50">
-                    <span>🛏️ {property.bedrooms} Bed</span>
-                    <span>🚿 {property.bathrooms} Bath</span>
-                    <span>📐 {property.area_sqft} sqft</span>
+                <div className="flex items-center gap-3 text-[10px] font-medium text-gray-600 my-2.5 py-1.5 border-y border-gray-100">
+                    <span>🛏️ {property.bedrooms}</span>
+                    <span>🚿 {property.bathrooms}</span>
+                    <span>📐 {property.area_sqft}</span>
                 </div>
 
                 {/* Amenities Icons */}
-                <div className="flex flex-wrap gap-1.5 mb-5">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                     {amenities.slice(0, 4).map((a, i) => (
-                        <span key={i} className="bg-gray-50 text-gray-600 text-[10px] px-2 py-1 rounded border border-gray-100" title={a}>
-                            {getAmenityIcon(a)} {a.replace('_', ' ')}
+                        <span 
+                            key={i} 
+                            className="bg-gray-50 text-gray-600 text-[8px] px-1.5 py-0.5 rounded border border-gray-200" 
+                            title={a}
+                        >
+                            {getAmenityIcon(a)}
                         </span>
                     ))}
                 </div>
@@ -191,24 +294,35 @@ const PropertyCard = ({ property, onWishlistChange }) => {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                     <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // This will work through the parent Link
-                      }}
-                      className="flex-grow bg-[#00BFA5] text-white text-center py-2.5 rounded-xl hover:brightness-110 transition-all font-bold text-sm shadow-sm active:scale-95">
+                        onClick={handleViewDetails}
+                        className="flex-1 bg-[#00BFA5] text-white text-center py-1.5 rounded hover:brightness-110 transition-all font-semibold text-[10px]"
+                    >
                         View Details
                     </button>
-                    <button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.location.href = `/properties/${property.id}/map`;
-                      }} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 border border-blue-100" title="View on Map">📍</button>
-                    <button onClick={handleShare} className="p-2.5 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 border border-gray-100" title="Share">🔗</button>
-                    <button onClick={handleWhatsAppShare} className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 border border-green-100" title="WhatsApp Share">💬</button>
+                    <button 
+                        onClick={handleMapView} 
+                        className="w-7 h-7 flex items-center justify-center bg-blue-50 text-blue-600 rounded hover:bg-blue-100 border border-blue-200 text-xs" 
+                        title="View on Map"
+                    >
+                        📍
+                    </button>
+                    <button 
+                        onClick={handleShare} 
+                        className="w-7 h-7 flex items-center justify-center bg-gray-50 text-gray-500 rounded hover:bg-gray-100 border border-gray-200 text-xs" 
+                        title="Share"
+                    >
+                        🔗
+                    </button>
+                    <button 
+                        onClick={handleWhatsAppShare} 
+                        className="w-7 h-7 flex items-center justify-center bg-green-50 text-green-600 rounded hover:bg-green-100 border border-green-200 text-xs" 
+                        title="WhatsApp"
+                    >
+                        💬
+                    </button>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 };
 

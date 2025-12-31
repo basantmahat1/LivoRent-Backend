@@ -143,3 +143,4 @@ export const paymentAPI = {
   getAllPayments: (params) => api.get('/payments/admin/all', { params }),
   verifyPayment: (paymentId, data) => api.patch(`/payments/admin/verify/${paymentId}`, data)
 };
+export default api;

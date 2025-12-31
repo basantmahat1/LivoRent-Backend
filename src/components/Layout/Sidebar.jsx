@@ -14,7 +14,7 @@ import {
   PlusOutlined,
   BankOutlined,
   TeamOutlined,
-  SettingOutlined,
+  SettingOutlined, // Added SettingOutlined
   LogoutOutlined,
   WalletOutlined
 } from '@ant-design/icons';
@@ -35,6 +35,7 @@ const Sidebar = () => {
       [PATHS.TENANT_PROPERTIES]: 'tenant-properties',
       [PATHS.TENANT_BOOKINGS]: 'tenant-bookings',
       [PATHS.TENANT_PROFILE]: 'tenant-profile',
+      [PATHS.TENANT_CHANGE_PASSWORD]: 'tenant-change-password', // Added
 
       [PATHS.OWNER_DASHBOARD]: 'owner-dashboard',
       [PATHS.OWNER_PROPERTIES]: 'owner-properties',
@@ -57,6 +58,7 @@ const Sidebar = () => {
     { key: 'tenant-properties', icon: <SearchOutlined />, label: 'Find Properties', onClick: () => navigate(PATHS.TENANT_PROPERTIES) },
     { key: 'tenant-bookings', icon: <CalendarOutlined />, label: 'My Bookings', onClick: () => navigate(PATHS.TENANT_BOOKINGS) },
     { key: 'tenant-profile', icon: <UserOutlined />, label: 'Profile', onClick: () => navigate(PATHS.TENANT_PROFILE) },
+    { key: 'tenant-change-password', icon: <SettingOutlined />, label: 'Change Password', onClick: () => navigate(PATHS.TENANT_CHANGE_PASSWORD) }, // Added
   ];
 
   const ownerItems = [

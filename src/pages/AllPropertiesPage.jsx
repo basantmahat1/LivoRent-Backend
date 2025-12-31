@@ -107,7 +107,7 @@ const AllPropertiesPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Navbar />
+      {/* <Navbar /> */}
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -300,7 +300,7 @@ const AllPropertiesPage = () => {
             ) : properties.length > 0 ? (
               <>
                 {/* Properties Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-max">
                   {properties.map((property) => (
                     <PropertyCard key={property.id} property={property} />
                   ))}

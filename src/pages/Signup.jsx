@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Layout/Navbar';
 import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
@@ -131,7 +130,6 @@ const Signup = () => {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-[var(--color-bg-light)] flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
           {/* FORM STEP */}

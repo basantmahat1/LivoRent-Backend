@@ -13,6 +13,8 @@
     --color-accent: #FF6B6B;
     --color-success: #00BFA5;
     --color-warning: #FFA726;
+    --speed: 1s;
+    --curve: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   * {
@@ -55,6 +57,9 @@
 }
 
 @layer components {
+ 
+  .dock-icon:active { transform: scale(0.85); }
+
   /* Buttons */
   .btn-primary {
     @apply bg-[var(--color-secondary)] text-white px-6 py-3 rounded-lg font-semibold
@@ -230,7 +235,7 @@
   @apply bg-white rounded-xl shadow-sm p-4 mb-4 border border-gray-200;
 }
 }
-
+ 
 @layer utilities {
   .text-gradient {
     background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
