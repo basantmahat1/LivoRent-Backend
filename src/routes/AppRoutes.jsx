@@ -5,8 +5,9 @@ import TenantProtectedRoute from '../routes/TenantProtectedRoute';
 
 // Public Pages
 import Home from '../pages/Home';
-import Signup from '../pages/Signup';
 import AdminLogin from '../pages/Admin/AdminLogin';
+import Login from '../components/Auth/Login';
+import Signup from '../pages/Signup';
 import PropertyDetails from '../pages/Properties/PropertyDetails';
 import PropertyMapPage from '../pages/PropertyMapPage';
 import AllPropertiesPage from '../pages/AllPropertiesPage';
@@ -38,7 +39,8 @@ import AdminDeletedProperties from '../pages/Admin/AdminDeletedProperties';
 import AdminSettings from '../pages/Admin/AdminSettings';
 import PaymentVerification from '../pages/Admin/PaymentVerification';
 
-import Login from '../components/Auth/Login';
+// import LoginPage from '../pages/Auth/LoginPage';
+// import { Footer } from 'antd/es/layout/layout';
 
 const AppRoutes = () => {
   
@@ -50,11 +52,11 @@ const AppRoutes = () => {
         <Route path="/properties/:id" element={<PropertyDetails />} />
         <Route path="/allproperties" element={<AllPropertiesPage />} />
         <Route path="/faq" element={<FAQ />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
       </Route>
 
       <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/properties/:id/map" element={<PropertyMapPage />} />
 
       {/* ================== TENANT ROUTES ================== */}

@@ -107,8 +107,8 @@ const AllPropertiesPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* <Navbar /> */}
-
+      <Navbar />
+      
       {/* Main Content */}
       <div className="max-w-7xl mx-auto  sm:px-6 py-8">
         {/* Page Header */}
