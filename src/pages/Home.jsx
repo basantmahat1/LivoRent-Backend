@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
 import { FaLocationDot } from "react-icons/fa6";
 
-import PropertyCard from './Properties/PropertyCard';
+import { useAuth } from "../context/AuthContext";
 
-import { propertyAPI } from '../services/api';
-
-import { useAuth } from '../context/AuthContext';
-
-import FAQ from '../pages/FAQ';
-
-
+import FAQ from "../pages/FAQ";
 
 const Home = () => {
-
   const { isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
@@ -26,214 +19,143 @@ const Home = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [ setInitialLoading] = useState(true);
+  const [setInitialLoading] = useState(true);
 
-  const [filters, setFilters] = useState({ city: '', property_type: '', max_price: '' });
+  const [filters, setFilters] = useState({
+    city: "",
+    property_type: "",
+    max_price: "",
+  });
 
-//  state definitions
+  //  state definitions
 
-const RECENT_LIMIT = 8; // 8 properties for home page
+  const RECENT_LIMIT = 6; // 8 properties for home page
 
   const [activeSlide, setActiveSlide] = useState(0);
 
-  const sliderImages = [
-
-    "/indoor.jpg",
-
-    "/indoor-design.jpg",
-
-    "/view.jpg",
-
-
-
-   ];
-
-
+  const sliderImages = ["/indoor.jpg", "/indoor-design.jpg", "/view.jpg"];
 
   useEffect(() => {
-
     const loadData = async () => {
-
       setInitialLoading(true);
 
       await Promise.all([loadAllProperties(), loadFeaturedProperties()]);
 
       setInitialLoading(false);
-
     };
-
-   
 
     loadData();
 
-   
-
     const interval = setInterval(() => {
-
       setActiveSlide((prev) => (prev + 1) % sliderImages.length);
-
     }, 6000);
 
-   
-
     return () => clearInterval(interval);
-
   }, []);
 
-
-
   useEffect(() => {
-
     loadAllProperties();
-
   }, [filters]);
 
-const loadAllProperties = async () => {
-
-  setLoading(true);
-
-  try {
-
-    // ✅ Backend बाटै 8 properties लिने
-
-    const res = await propertyAPI.getAll({
-
-      ...filters,
-
-      sort_by: 'newest',
-
-      limit: RECENT_LIMIT,
-
-      offset: 0
-
-    });
-
-   
-
-    setProperties(res.data.properties || []);
-
-  } catch (error) {
-
-    console.error('Error loading properties:', error);
-
-    setProperties([]);
-
-  } finally {
-
-    setLoading(false);
-
-  }
-
-};
-
- 
-
-  const loadFeaturedProperties = async () => {
+  const loadAllProperties = async () => {
+    setLoading(true);
 
     try {
+      // ✅ Backend बाटै 8 properties लिने
 
+      const res = await propertyAPI.getAll({
+        ...filters,
+
+        sort_by: "newest",
+
+        limit: RECENT_LIMIT,
+
+        offset: 0,
+      });
+
+      setProperties(res.data.properties || []);
+    } catch (error) {
+      console.error("Error loading properties:", error);
+
+      setProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFeaturedProperties = async () => {
+    try {
       const res = await propertyAPI.getFeatured();
 
       setFeaturedProperties(res.data.properties || []);
-
     } catch (err) {
-
-      console.error('Error loading featured properties:', err);
+      console.error("Error loading featured properties:", err);
 
       setFeaturedProperties([]);
-
     }
-
   };
-
-
 
   const handleSearch = (e) => {
-
     e.preventDefault();
 
-    navigate('/properties', { state: { filters } });
-
+    navigate("/properties", { state: { filters } });
   };
-
-
 
   const handleFilterChange = (key, value) => {
-
-    setFilters(prev => ({ ...prev, [key]: value }));
-
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
-
-
 
   const handleCategoryClick = (type) => {
-
-    handleFilterChange('property_type', type);
+    handleFilterChange("property_type", type);
 
     if (window.innerWidth < 768) {
-
-      navigate('/properties', { state: { filters: { ...filters, property_type: type } } });
-
+      navigate("/properties", {
+        state: { filters: { ...filters, property_type: type } },
+      });
     }
-
   };
-
-
 
   const handleCityClick = (city) => {
-
-    handleFilterChange('city', city);
+    handleFilterChange("city", city);
 
     if (window.innerWidth < 768) {
-
-      navigate('/properties', { state: { filters: { ...filters, city } } });
-
+      navigate("/properties", { state: { filters: { ...filters, city } } });
     }
-
   };
 
-
-
- 
-
   return (
-
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-[#1A2B3C] antialiased">
-
-      
-
-
-
       {/* 1. PREMIUM HERO SECTION */}
 
       <section className="relative h-[430px] flex items-center justify-center overflow-hidden">
-
         {sliderImages.map((img, idx) => (
-
-          <div key={idx} className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${idx === activeSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}>
-
+          <div
+            key={idx}
+            className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
+              idx === activeSlide
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-110"
+            }`}
+          >
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60 z-10" />
 
-            <img src={img} alt="Premium Living" className="w-full h-full object-cover" loading="lazy" />
-
+            <img
+              src={img}
+              alt="Premium Living"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
-
         ))}
 
-
-
         <div className="relative z-20 max-w-6xl mx-auto text-center px-4 sm:px-6 gap-6">
-
           <span className="inline-block bg-[#00BFA5]/20 backdrop-blur-md text-[#00BFA5] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest  animate-fade-in">
-
             ✨ Your Premium Rental Partner
-
           </span>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-20 sm:mb-30 tracking-tight leading-tight">
-
-            Elevate Your <span className="text-[#00BFA5]">Living</span> Experience
-
+            Elevate Your <span className="text-[#00BFA5]">Living</span>{" "}
+            Experience
           </h1>
 
  <div className="backdrop-blur-xl bg-white/10 p-2 rounded-3xl max-w-5xl mx-auto transform hover:scale-[1.02] transition-all duration-500 shadow-2xl border border-white/20">
@@ -294,81 +216,52 @@ const loadAllProperties = async () => {
 
 
           <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-4 text-white/80 text-xs sm:text-sm font-medium">
+            <span className="opacity-60 uppercase tracking-widest text-[10px] flex items-center">
+              Trending Cities:
+            </span>
 
-            <span className="opacity-60 uppercase tracking-widest text-[10px] flex items-center">Trending Cities:</span>
-
-            {['Kathmandu', 'Pokhara', 'Lalitpur', 'Butwal'].map(city => (
-
+            {["Kathmandu", "Pokhara", "Lalitpur", "Butwal"].map((city) => (
               <button
-
                 key={city}
-
                 onClick={() => handleCityClick(city)}
-
                 className="px-2 sm:px-3 py-1 bg-white/10 hover:bg-[#00BFA5] rounded-full backdrop-blur-sm transition-colors text-xs sm:text-sm"
-
               >
-
                 {city}
-
               </button>
-
             ))}
-
           </div>
-
         </div>
-
       </section>
-
-
 
       {/* 2. STATS & TRUST BAR */}
 
-     <section className="relative -mt-8 sm:-mt-12 z-30 max-w-6xl mx-auto px-3 sm:px-4">
+      <section className="relative -mt-8 sm:-mt-12 z-30 max-w-6xl mx-auto px-3 sm:px-4">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.05)] border border-gray-100 p-4 sm:p-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          {[
+            { n: "3,000+", l: "Listings" },
 
-  <div className="bg-white rounded-xl sm:rounded-2xl shadow-[0_12px_30px_rgba(0,0,0,0.05)] border border-gray-100 p-4 sm:p-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            { n: "10k+", l: "Happy Users" },
 
-    {[
+            { n: "100%", l: "Verified" },
 
-      { n: '3,000+', l: 'Listings' },
+            { n: "0%", l: "Commission" },
+          ].map((stat, i) => (
+            <div key={i} className="text-center group">
+              <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#1A2B3C] group-hover:text-[#00BFA5] transition-colors">
+                {stat.n}
+              </p>
 
-      { n: '10k+', l: 'Happy Users' },
-
-      { n: '100%', l: 'Verified' },
-
-      { n: '0%', l: 'Commission' }
-
-    ].map((stat, i) => (
-
-      <div key={i} className="text-center group">
-
-        <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#1A2B3C] group-hover:text-[#00BFA5] transition-colors">
-
-          {stat.n}
-
-        </p>
-
-        <p className="text-gray-400 text-[9px] font-bold uppercase tracking-[0.18em] mt-0.5">
-
-          {stat.l}
-
-        </p>
-
-      </div>
-
-    ))}
-
-  </div>
-
-</section>
-
-
+              <p className="text-gray-400 text-[9px] font-bold uppercase tracking-[0.18em] mt-0.5">
+                {stat.l}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* 3. CATEGORIES */}
 
       <section className="py-4 sm:py-6 md:py-8 max-w-7xl mx-auto px-4 sm:px-6">
-
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 sm:mb-12 md:mb-16 gap-4 sm:gap-6">
 
          <div className="max-w-xl mx-auto text-center">
@@ -386,76 +279,88 @@ const loadAllProperties = async () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-
           {[
+            { label: "Single Room", icon: "🏠", type: "room" },
 
-            { label: 'Single Room', icon: '🏠', type: 'room' },
+            { label: "Luxury Flat", icon: "🏢", type: "flat" },
 
-            { label: 'Luxury Flat', icon: '🏢', type: 'flat' },
+            { label: "House", icon: "🏡", type: "house" },
 
-            { label: 'House', icon: '🏡', type: 'house' },
+            { label: "Office", icon: "💼", type: "office" },
 
-            { label: 'Office', icon: '💼', type: 'office' },
-
-            { label: 'Roommate', icon: '🤝', type: 'roommate' }
-
+            { label: "Roommate", icon: "🤝", type: "roommate" },
           ].map((cat) => (
-
             <button
-
               key={cat.label}
-
               onClick={() => handleCategoryClick(cat.type)}
-
               className="group bg-white p-2 sm:p-4 md:p-4 rounded-2xl sm:rounded-3xl border border-gray-100 hover:border-[#00BFA5]/30 hover:shadow-[0_20px_40px_rgba(0,191,165,0.1)] transition-all duration-500 text-center"
-
             >
+              <div className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-2 md:mb-4 transform group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">
+                {cat.icon}
+              </div>
 
-              <div className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-2 md:mb-4 transform group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">{cat.icon}</div>
-
-              <p className="font-bold text-[#1A2B3C] group-hover:text-[#00BFA5] transition-colors text-xs sm:text-sm md:text-base">{cat.label}</p>
-
+              <p className="font-bold text-[#1A2B3C] group-hover:text-[#00BFA5] transition-colors text-xs sm:text-sm md:text-base">
+                {cat.label}
+              </p>
             </button>
-
           ))}
-
         </div>
-
       </section>
-
-
 
       {/* 4. PREMIUM LISTINGS */}
 
       {featuredProperties.length > 0 && (
-
         <section className="bg-white py-4 sm:py-4 md:py-6 px-4 sm:px-6 border-y border-gray-100">
-
           <div className="max-w-7xl mx-auto">
-
             <div className="flex items-center gap-4 mb-8 sm:mb-12">
-
               <div className="h-px bg-gray-200 flex-grow"></div>
 
-              <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#1A2B3C] uppercase tracking-tighter whitespace-nowrap">⭐ Premium Selection</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#1A2B3C] uppercase tracking-tighter whitespace-nowrap">
+                ⭐ Premium Selection
+              </h2>
 
               <div className="h-px bg-gray-200 flex-grow"></div>
-
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
-
-              {featuredProperties.slice(0, 4).map((p) => <PropertyCard key={p.id} property={p} />)}
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+              {featuredProperties.slice(0, 3).map((p) => (
+                <PropertyCard key={p.id} property={p} />
+              ))}
             </div>
-
           </div>
-
         </section>
-
       )}
 
+      {/* 5. NEW ARRIVALS */}
 
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-4 md:py-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A2B3C]">
+            Recently Added
+          </h2>
+
+          <Link
+            to="/allproperties"
+            className="group text-[#1A2B3C] font-bold flex items-center gap-2 hover:text-[#00BFA5]  transition-colors text-sm sm:text-base"
+          >
+            Explore All Listings{" "}
+            <span className="group-hover:translate-x-2 transition-transform">
+              →
+            </span>
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-64 sm:h-80 md:h-96 bg-gray-100 rounded-2xl sm:rounded-3xl animate-pulse"
+              />
+            ))}
+          </div>
+        ) : properties.length > 0 ? (
+          // ✅ NO .slice() - 8 data comes from bacend
 
    {/* 5. NEW ARRIVALS */}
 
@@ -660,20 +565,38 @@ const loadAllProperties = async () => {
 
             <div className="w-12 h-12 rounded-full bg-gray-100" />
 
-            <div>
+          <div className="absolute -top-36 -right-36 w-[480px] h-[480px] bg-[#00BFA5]/20 rounded-full blur-[160px] animate-pulse" />
 
-              <p className="font-bold text-[#1A2B3C]">Anil Sharma</p>
+          <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#00BFA5]/10 rounded-full blur-[120px] animate-pulse" />
 
-              <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">
+          <div className="relative z-10">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6 tracking-tight">
+              List Your Property <br />
+              <span className="text-[#00BFA5]">For Free</span>
+            </h2>
 
-                Verified Tenant
+            <p className="text-white/75 text-base sm:text-lg max-w-xl mx-auto mb-12">
+              Reach thousands of verified tenants and manage listings
+              effortlessly — no brokers, no hidden charges.
+            </p>
 
-              </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <Link
+                to={isAuthenticated ? "/post-ad" : "/login"}
+                state={!isAuthenticated ? { from: "/post-ad" } : null}
+                className="bg-[#00BFA5] text-[#1A2B3C] px-12 py-4 rounded-3xl font-extrabold text-lg hover:scale-105 hover:shadow-xl transition-transform shadow-[#00BFA5]/50"
+              >
+                Start Listing Now
+              </Link>
 
+              <Link
+                to="/how-it-works"
+                className="bg-white/10 text-white border border-white/20 px-12 py-4 rounded-3xl font-bold text-lg hover:bg-white/20 hover:backdrop-brightness-125 transition-all backdrop-blur-md"
+              >
+                Learn More
+              </Link>
             </div>
-
           </div>
-
         </div>
 
       ))}
@@ -771,11 +694,7 @@ const loadAllProperties = async () => {
 
       
     </div>
-
   );
-
 };
-
-
 
 export default Home;
