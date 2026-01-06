@@ -4,7 +4,7 @@ import { paymentAPI } from '../../services/api';
 const PaymentVerification = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('pending');
+  const [statusFilter, setStatusFilter] = useState('pending_verification');
   const [searchFilters, setSearchFilters] = useState({
     transaction_id: '',
     tenant_name: ''
@@ -116,7 +116,7 @@ const PaymentVerification = () => {
         {/* Filter & Search Bar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-5 bg-white p-1.5 rounded-xl border border-gray-200 flex gap-1">
-            {['all', 'pending', 'verified', 'rejected'].map((s) => (
+            {['all', 'pending_verification', 'verified', 'rejected'].map((s) => (
               <button
                 key={s}
                 onClick={() => { setStatusFilter(s); setCurrentPage(1); }}
@@ -124,7 +124,7 @@ const PaymentVerification = () => {
                   statusFilter === s ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'
                 }`}
               >
-                {s.toUpperCase()}
+                {s === 'pending_verification' ? 'PENDING' : s.toUpperCase()}
               </button>
             ))}
           </div>
@@ -220,6 +220,7 @@ const PaymentVerification = () => {
 const PaymentCard = ({ payment, onVerify, onReject, onImageClick }) => {
   const statusStyles = {
     pending: "bg-amber-50 text-amber-600 border-amber-200",
+    pending_verification: "bg-amber-50 text-amber-600 border-amber-200",
     verified: "bg-emerald-50 text-emerald-600 border-emerald-200",
     rejected: "bg-rose-50 text-rose-600 border-rose-200"
   };
@@ -267,7 +268,7 @@ const PaymentCard = ({ payment, onVerify, onReject, onImageClick }) => {
               <p className="text-sm font-mono font-bold text-blue-600 truncate">{payment.transaction_id || 'N/A'}</p>
             </div>
             <div className="flex gap-2 justify-end">
-              {payment.payment_status === 'pending' && (
+              {(payment.payment_status === 'pending' || payment.payment_status === 'pending_verification') && (
                 <>
                   <button onClick={() => onReject(payment.payment_id)} className="text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-lg text-xs font-bold transition-colors">Reject</button>
                   <button onClick={() => onVerify(payment)} className="bg-gray-900 text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 transition-all">Verify</button>

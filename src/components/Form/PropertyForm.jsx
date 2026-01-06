@@ -7,7 +7,7 @@ import { propertyAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import MapModal from '../Map/MapModal';
 
-const PropertyForm = ({ property = null, onSuccess }) => {
+const PropertyForm = ({ property = null, onSuccess, editId = null }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
@@ -94,16 +94,17 @@ const PropertyForm = ({ property = null, onSuccess }) => {
   });
 
   useEffect(() => {
-    if (id) {
-      loadProperty();
+    const propertyIdToLoad = editId || id;
+    if (propertyIdToLoad) {
+      loadProperty(propertyIdToLoad);
     } else if (property) {
       populateForm(property);
     }
-  }, [id, property]);
+  }, [editId, id, property]);
 
-  const loadProperty = async () => {
+  const loadProperty = async (propertyId) => {
     try {
-      const response = await propertyAPI.getById(id);
+      const response = await propertyAPI.getById(propertyId);
       populateForm(response.data.property);
     } catch (error) {
       setError('Failed to load property details');
@@ -408,7 +409,8 @@ const PropertyForm = ({ property = null, onSuccess }) => {
         }
       });
 
-      if (!id) {
+      const propertyIdToUpdate = editId || id;
+      if (!propertyIdToUpdate) {
         images.forEach(image => formDataToSend.append('images', image));
       } else {
         if (existingImages.length > 0) {
@@ -418,13 +420,13 @@ const PropertyForm = ({ property = null, onSuccess }) => {
       }
 
       let response;
-      if (id) {
-        response = await propertyAPI.update(id, formDataToSend);
+      if (propertyIdToUpdate) {
+        response = await propertyAPI.update(propertyIdToUpdate, formDataToSend);
       } else {
         response = await propertyAPI.create(formDataToSend);
       }
 
-      setSuccess(id ? 'Property updated successfully!' : 'Property added successfully!');
+      setSuccess(propertyIdToUpdate ? 'Property updated successfully!' : 'Property added successfully!');
 
       setTimeout(() => {
         if (onSuccess) {
@@ -452,12 +454,12 @@ const PropertyForm = ({ property = null, onSuccess }) => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-[var(--color-primary)] mb-3">
-            {id ? '✏️ Edit Property' : `${isAdmin ? '📢 Post Property' : '➕ Add New Property'}`}
+            {editId || id ? '✏️ Edit Property' : `${isAdmin ? '📢 Post Property' : '➕ Add New Property'}`}
           </h1>
           <p className="text-gray-700 text-lg">
             {isAdmin 
               ? 'Post property advertisement to the portal'
-              : `Fill in the details to ${id ? 'update' : 'list'} your property`
+              : `Fill in the details to ${editId || id ? 'update' : 'list'} your property`
             }
           </p>
         </div>

@@ -133,7 +133,7 @@ const OwnerProperties = () => {
                       </div>
                       <div className="text-right">
                         <div className="price-tag text-[var(--color-secondary)] text-2xl font-bold">
-                          ${property.price}
+                          ₹{property.price}
                         </div>
                         <div className="text-sm text-gray-400">per month</div>
                       </div>
@@ -189,29 +189,34 @@ const OwnerProperties = () => {
                     >
                       <span>👁</span> View
                     </Link>
-                    <Link
-                      to={`/owner/properties/${property.id}/edit`}
-                      className="btn-primary flex items-center gap-2 px-5 py-2.5 font-semibold"
-                    >
-                      <span>✏️</span> Edit
-                    </Link>
-                    <button
-                      onClick={() => toggleAvailability(property.id, property.is_available)}
-                      className={`px-5 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                        property.is_available
-                          ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                          : 'bg-green-500 text-white hover:bg-green-600'
-                      }`}
-                    >
-                      <span>{property.is_available ? '🔒' : '✓'}</span>
-                      {property.is_available ? 'Mark Unavailable' : 'Mark Available'}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(property.id)}
-                      className="btn-danger flex items-center gap-2 px-5 py-2.5 font-semibold"
-                    >
-                      <span>🗑️</span> Delete
-                    </button>
+
+                    {!property.is_verified && (
+                      <>
+                        <Link
+                          to={`/owner/add-property?id=${property.id}`}
+                          className="btn-primary flex items-center gap-2 px-5 py-2.5 font-semibold"
+                        >
+                          <span>✏️</span> Edit
+                        </Link>
+                        <button
+                          onClick={() => toggleAvailability(property.id, property.is_available)}
+                          className={`px-5 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                            property.is_available
+                              ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                              : 'bg-green-500 text-white hover:bg-green-600'
+                          }`}
+                        >
+                          <span>{property.is_available ? '🔒' : '✓'}</span>
+                          {property.is_available ? 'Mark Unavailable' : 'Mark Available'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(property.id)}
+                          className="btn-danger flex items-center gap-2 px-5 py-2.5 font-semibold"
+                        >
+                          <span>🗑️</span> Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

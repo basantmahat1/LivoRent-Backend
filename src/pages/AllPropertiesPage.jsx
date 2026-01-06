@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../components/Layout/Navbar";
 import PropertyCard from "./Properties/PropertyCard";
 import { propertyAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
@@ -107,7 +106,7 @@ const AllPropertiesPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Navbar />
+    
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto  sm:px-6 py-8">

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import Navbar from '../../components/Layout/Navbar';
 import MapView from '../../components/Map/MapView';
 import { propertyAPI, bookingAPI, wishlistAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { ShareAltOutlined, MessageOutlined } from '@ant-design/icons';
+import { ShareAltOutlined, MessageOutlined, HeartFilled, HeartOutlined, EnvironmentOutlined, HomeOutlined, ArrowsAltOutlined, CheckCircleOutlined, StarFilled, LeftOutlined } from '@ant-design/icons';
 import RoutingMap from '../../components/Map/RoutingMap';
 
 const PropertyDetails = () => {
@@ -78,7 +77,7 @@ const PropertyDetails = () => {
 
     const uniqueImages = [...new Set(images)];
     if (uniqueImages.length === 0) {
-      return ["https://via.placeholder.com/1200x600/cccccc/969696?text=No+Property+Images"];
+      return ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80"];
     }
     return uniqueImages;
   };
@@ -215,239 +214,273 @@ const PropertyDetails = () => {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg font-medium">Loading property details...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <div className="relative mb-6">
+            <div className="w-24 h-24 border-4 border-blue-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-24 h-24 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">Loading Property Details</h3>
+          <p className="text-gray-500">Please wait while we fetch the perfect home for you...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   if (!property) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Property Not Found</h2>
-            <p className="text-gray-600 mb-6">The property you're looking for doesn't exist.</p>
-            <button
-              onClick={() => navigate('/')}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-            >
-              Browse Properties
-            </button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+            <HomeOutlined className="text-4xl text-gray-400" />
           </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Property Not Found</h2>
+          <p className="text-gray-600 mb-8">The property you're looking for doesn't exist or has been removed.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Browse Properties
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gray-50">
-        {/* Header Section */}
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+      {/* Back Navigation */}
+      <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+              className="group flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <LeftOutlined className="group-hover:-translate-x-1 transition-transform" />
               Back to Properties
             </button>
+            
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleShare}
+                className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-lg hover:bg-gray-100"
+                title="Share"
+              >
+                <ShareAltOutlined className="text-lg" />
+              </button>
+              <button
+                onClick={handleWishlistToggle}
+                className="p-2 text-gray-600 hover:text-red-500 transition-colors rounded-lg hover:bg-gray-100"
+                title="Save to Wishlist"
+              >
+                {inWishlist ? <HeartFilled className="text-red-500 text-lg" /> : <HeartOutlined className="text-lg" />}
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Title & Location */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">{property.title}</h1>
-            <div className="flex items-center gap-6 flex-wrap">
-              <div className="flex items-center text-gray-600">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>{property.address}, {property.city}</span>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold capitalize">
+                  {property.property_type}
+                </span>
+                {property.is_verified && (
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold flex items-center gap-1">
+                    <CheckCircleOutlined className="text-xs" />
+                    Verified
+                  </span>
+                )}
               </div>
-              {property.avg_rating && property.avg_rating > 0 && (
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                  <span className="font-semibold text-gray-900">{property.avg_rating.toFixed(1)}</span>
-                  <span className="text-gray-600">({property.total_reviews || 0} reviews)</span>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                {property.title}
+              </h1>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <EnvironmentOutlined className="text-blue-500" />
+                  <span className="font-medium">{property.address}, {property.city}</span>
                 </div>
+                {property.avg_rating && property.avg_rating > 0 && (
+                  <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                    <StarFilled className="text-yellow-500" />
+                    <span className="font-bold text-gray-900">{property.avg_rating.toFixed(1)}</span>
+                    <span className="text-gray-600 text-sm">({property.total_reviews || 0} reviews)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-2xl shadow-xl min-w-[240px]">
+              <div className="text-sm text-blue-100 mb-1">Monthly Rent</div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl lg:text-5xl font-bold">${property.price}</span>
+                <span className="text-blue-100">/month</span>
+              </div>
+              {property.instant_booking && (
+                <div className="mt-3 text-sm font-semibold text-green-300">✓ Instant Booking Available</div>
               )}
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Images & Details */}
-            <div className="lg:col-span-2">
-              {/* Image Gallery */}
-              <div className="mb-8">
-                <div className="relative rounded-xl overflow-hidden mb-4 bg-gray-200 aspect-video shadow-lg">
-                  <img
-                    src={allImages[selectedImage]}
-                    alt={`${property.title} - Image ${selectedImage + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/1200x675/cccccc/969696?text=Image+Not+Available';
-                      e.target.onerror = null;
-                    }}
-                  />
-                  
-                  {allImages.length > 1 && (
-                    <>
-                      <button
-                        onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                      
-                      <button
-                        onClick={handleWishlistToggle}
-                        className="absolute top-4 right-4 bg-white rounded-full p-3 shadow-lg hover:scale-110 transition-transform"
-                      >
-                        <svg className={`w-6 h-6 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                      </button>
-                      
-                      <button
-                        onClick={handleShare}
-                        className="absolute top-4 left-4 bg-white rounded-full p-3 shadow-lg hover:scale-110 transition-transform"
-                      >
-                        <ShareAltOutlined className="text-lg text-gray-700" />
-                      </button>
-                      
-                      <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium">
-                        {selectedImage + 1} / {allImages.length}
-                      </div>
-                    </>
-                  )}
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Images & Details */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Image Gallery */}
+            <div className="space-y-4">
+              <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-xl">
+                <img
+                  src={allImages[selectedImage]}
+                  alt={`${property.title} - Image ${selectedImage + 1}`}
+                  className="w-full h-[500px] object-cover transition-opacity duration-300"
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600&q=80';
+                    e.target.onerror = null;
+                  }}
+                />
                 
                 {allImages.length > 1 && (
-                  <div className="grid grid-cols-6 gap-2">
-                    {allImages.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSelectedImage(i)}
-                        className={`rounded-lg overflow-hidden aspect-square transition-all ${
-                          selectedImage === i ? 'ring-2 ring-blue-600 ring-offset-2' : 'opacity-70 hover:opacity-100'
-                        }`}
-                      >
-                        <img
-                          src={img}
-                          alt={`Thumbnail ${i + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/200x150/cccccc/969696?text=No+Image';
-                            e.target.onerror = null;
-                          }}
-                        />
-                      </button>
-                    ))}
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full w-14 h-14 flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-3xl"
+                    >
+                      <LeftOutlined className="text-xl" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full w-14 h-14 flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-3xl"
+                    >
+                      <LeftOutlined className="text-xl rotate-180" />
+                    </button>
+                    
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/70 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      {selectedImage + 1} / {allImages.length}
+                    </div>
+                  </>
+                )}
+              </div>
+              
+              {allImages.length > 1 && (
+                <div className="grid grid-cols-6 gap-3">
+                  {allImages.slice(0, 6).map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(i)}
+                      className={`relative rounded-xl overflow-hidden aspect-square transition-all duration-300 ${
+                        selectedImage === i 
+                          ? 'ring-3 ring-blue-500 ring-offset-2 scale-105' 
+                          : 'opacity-80 hover:opacity-100 hover:scale-102'
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Thumbnail ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {selectedImage === i && (
+                        <div className="absolute inset-0 bg-blue-500/20"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Property Highlights */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <HomeOutlined className="text-blue-500" />
+                Property Highlights
+              </h2>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <HomeOutlined className="text-2xl text-blue-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{property.bedrooms}</div>
+                  <div className="text-gray-600 font-medium">Bedrooms</div>
+                </div>
+                
+                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    {/* <BathOutlined className="text-2xl text-blue-600" /> */}
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{property.bathrooms}</div>
+                  <div className="text-gray-600 font-medium">Bathrooms</div>
+                </div>
+                
+                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ArrowsAltOutlined className="text-2xl text-blue-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{property.area_sqft}</div>
+                  <div className="text-gray-600 font-medium">Sq Ft</div>
+                </div>
+                
+                {property.furnishing && (
+                  <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                      </svg>
+                    </div>
+                    <div className="text-lg font-bold text-gray-900 mb-1 capitalize">{property.furnishing}</div>
+                    <div className="text-gray-600 font-medium">Furnishing</div>
                   </div>
                 )}
               </div>
 
-              {/* Property Details */}
-              <div className="bg-white rounded-xl p-8 shadow-sm mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Property Details</h2>
-                
-                <div className="grid grid-cols-4 gap-6 mb-8">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <svg className="w-6 h-6 text-gray-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <div className="text-sm text-gray-600 mb-1">Bedrooms</div>
-                    <div className="font-semibold text-gray-900">{property.bedrooms}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <svg className="w-6 h-6 text-gray-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                    </svg>
-                    <div className="text-sm text-gray-600 mb-1">Bathrooms</div>
-                    <div className="font-semibold text-gray-900">{property.bathrooms}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <svg className="w-6 h-6 text-gray-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                    </svg>
-                    <div className="text-sm text-gray-600 mb-1">Area</div>
-                    <div className="font-semibold text-gray-900">{property.area_sqft} Sq Ft</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <svg className="w-6 h-6 text-gray-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <div className="text-sm text-gray-600 mb-1">Type</div>
-                    <div className="font-semibold text-gray-900 capitalize">{property.property_type}</div>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-200 pt-6">
-                  <h3 className="font-semibold text-gray-900 mb-4 text-lg">Description</h3>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                    {property.description || 'No description available.'}
-                  </p>
-                </div>
+              <div className="border-t border-gray-200 pt-8">
+                <h3 className="font-bold text-gray-900 mb-4 text-xl">About This Property</h3>
+                <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-line">
+                  {property.description || 'A beautiful property located in a prime location. Contact owner for more details.'}
+                </p>
               </div>
+            </div>
 
-              {/* Amenities */}
-              {property.amenities && property.amenities.length > 0 && (
-                <div className="bg-white rounded-xl p-8 shadow-sm mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Amenities</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {Array.isArray(property.amenities) && property.amenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+            {/* Amenities Section */}
+            {property.amenities && property.amenities.length > 0 && (
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Amenities & Features</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {Array.isArray(property.amenities) && property.amenities.map((amenity, index) => (
+                    <div key={index} className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors group">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-sm text-gray-700 capitalize">{amenity.replace(/_/g, ' ')}</span>
                       </div>
-                    ))}
-                  </div>
+                      <span className="text-gray-700 font-medium capitalize">{amenity.replace(/_/g, ' ')}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Map Section */}
-              {property.latitude && property.longitude && (
-                <div className="bg-white rounded-xl p-8 shadow-sm">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Location & Navigation</h2>
-                  <p className="text-sm text-gray-600 mb-6">
-                    Coordinates: {parseFloat(property.latitude).toFixed(6)}, {parseFloat(property.longitude).toFixed(6)}
-                  </p>
-
-                  <div className="flex gap-3 mb-6">
+            {/* Map Section */}
+            {property.latitude && property.longitude && (
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Location & Navigation</h2>
+                    <p className="text-gray-600">
+                      {property.address}, {property.city}
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
                     <button
                       onClick={() => setMapView('simple')}
-                      className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                      className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
                         mapView === 'simple'
-                          ? 'bg-blue-600 text-white shadow-md'
+                          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -455,147 +488,106 @@ const PropertyDetails = () => {
                     </button>
                     <button
                       onClick={() => setMapView('routing')}
-                      className={`flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                      className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
                         mapView === 'routing'
-                          ? 'bg-blue-600 text-white shadow-md'
+                          ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                       Get Directions
                     </button>
                   </div>
-
-                  <div className="rounded-lg overflow-hidden shadow-md border border-gray-200">
-                    {mapView === 'simple' ? (
-                      <MapView
-                        properties={[property]}
-                        center={[parseFloat(property.latitude), parseFloat(property.longitude)]}
-                        zoom={15}
-                      />
-                    ) : (
-                      <RoutingMap
-                        destination={[parseFloat(property.latitude), parseFloat(property.longitude)]}
-                        propertyTitle={property.title}
-                      />
-                    )}
-                  </div>
-
-                  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                    <div className="flex items-start gap-2">
-                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        {mapView === 'simple' ? (
-                          <>
-                            <strong>Viewing property location</strong>
-                            <p className="mt-1">Click the marker for details. Use zoom controls to explore the area.</p>
-                          </>
-                        ) : (
-                          <>
-                            <strong>Get Directions:</strong>
-                            <p className="mt-1">Click "Get Directions" button on the map, allow location access, choose travel mode, and view your route.</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Right Column - Booking Card */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl p-6 shadow-lg sticky top-24 border border-gray-200">
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-4xl font-bold text-gray-900">${property.price}</span>
-                    <span className="text-gray-600">/month</span>
-                  </div>
-                  {property.is_verified && (
-                    <div className="inline-flex items-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-semibold mt-2">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Verified Property
-                    </div>
+                <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200 h-[400px]">
+                  {mapView === 'simple' ? (
+                    <MapView
+                      properties={[property]}
+                      center={[parseFloat(property.latitude), parseFloat(property.longitude)]}
+                      zoom={15}
+                    />
+                  ) : (
+                    <RoutingMap
+                      destination={[parseFloat(property.latitude), parseFloat(property.longitude)]}
+                      propertyTitle={property.title}
+                    />
                   )}
                 </div>
 
-                {/* Property Stats */}
-                <div className="grid grid-cols-2 gap-3 mb-6 pb-6 border-b border-gray-200">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-gray-900">{property.view_count || 0}</div>
-                    <div className="text-xs text-gray-600 font-medium">Views</div>
-                  </div>
-                  {property.furnishing && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm font-bold text-gray-900 capitalize">{property.furnishing}</div>
-                      <div className="text-xs text-gray-600 font-medium">Furnishing</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Owner Info */}
-                <div className="mb-6 pb-6 border-b border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Property Owner</h3>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                      {property.owner_name?.charAt(0).toUpperCase() || 'O'}
+                <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <EnvironmentOutlined className="text-blue-600 text-lg" />
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900">{property.owner_name || 'Owner'}</div>
-                      {property.owner_verified && (
-                        <div className="text-xs text-green-600 font-semibold">✓ Verified</div>
-                      )}
+                      <h4 className="font-bold text-gray-900 mb-2">
+                        {mapView === 'simple' ? 'Property Location' : 'Get Directions'}
+                      </h4>
+                      <p className="text-gray-600">
+                        {mapView === 'simple' 
+                          ? 'The property is highlighted on the map. You can zoom in to see nearby amenities and explore the neighborhood.'
+                          : 'Enter your starting location in the map to get turn-by-turn directions to this property.'}
+                      </p>
                     </div>
                   </div>
-                  
-                  {isAuthenticated && user?.role === 'tenant' && (
-                    <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800">
-                      Contact details available after payment verification
-                    </div>
-                  )}
                 </div>
+              </div>
+            )}
+          </div>
 
-                {/* Action Buttons */}
-                <div className="space-y-3">
+          {/* Right Column - Booking & Owner Info */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Booking Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 sticky top-24">
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Make a Booking</h3>
+                
+                <div className="space-y-4">
                   {isAuthenticated && user?.role === 'tenant' ? (
-                    <>
-                      <button
-                        onClick={handleBookingClick}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
-                      >
-                        {property.instant_booking ? 'Book Instantly' : 'Request Booking'}
-                      </button>
-                      <button
-                        onClick={handleWishlistToggle}
-                        className={`w-full font-semibold py-3 rounded-lg transition-colors border-2 ${
-                          inWishlist
-                            ? 'bg-red-50 text-red-600 border-red-300 hover:bg-red-100'
-                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        {inWishlist ? '❤️ Saved' : '🤍 Save'}
-                      </button>
-                    </>
+                    <button
+                      onClick={handleBookingClick}
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      {property.instant_booking ? 'Book Instantly' : 'Request Booking'}
+                    </button>
                   ) : !isAuthenticated ? (
                     <button
                       onClick={handleBookingClick}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-md"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
                       Login to Book
                     </button>
                   ) : (
-                    <div className="bg-gray-100 text-gray-600 text-center py-3 rounded-lg border border-gray-300 text-sm">
+                    <div className="bg-gray-100 text-gray-600 text-center py-4 rounded-xl border border-gray-300 font-medium">
                       Only tenants can book properties
                     </div>
                   )}
 
+                  <button
+                    onClick={handleWishlistToggle}
+                    className={`w-full font-semibold py-4 rounded-xl transition-all duration-300 border-2 flex items-center justify-center gap-3 ${
+                      inWishlist
+                        ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {inWishlist ? (
+                      <>
+                        <HeartFilled className="text-red-500" />
+                        Saved to Wishlist
+                      </>
+                    ) : (
+                      <>
+                        <HeartOutlined />
+                        Save to Wishlist
+                      </>
+                    )}
+                  </button>
+
                   {property.owner_phone && (!isAuthenticated || user?.role !== 'tenant') && (
                     <button
                       onClick={handleWhatsAppContact}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 shadow-lg flex items-center justify-center gap-3"
                     >
                       <MessageOutlined />
                       WhatsApp Owner
@@ -604,102 +596,176 @@ const PropertyDetails = () => {
 
                   <button
                     onClick={handleShare}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 border border-gray-300"
+                    className="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-4 rounded-xl transition-colors border-2 border-gray-200 flex items-center justify-center gap-3"
                   >
                     <ShareAltOutlined />
                     Share Property
                   </button>
                 </div>
               </div>
+
+              {/* Owner Info */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="font-bold text-gray-900 mb-4">Property Owner</h3>
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {property.owner_name?.charAt(0).toUpperCase() || 'O'}
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">{property.owner_name || 'Owner'}</div>
+                    {property.owner_verified && (
+                      <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                        <CheckCircleOutlined className="text-xs" />
+                        Verified Owner
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {isAuthenticated && user?.role === 'tenant' && (
+                  <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <span>Contact details available after payment verification</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Property Stats */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="font-bold text-gray-900 mb-4">Property Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{property.view_count || 0}</div>
+                    <div className="text-sm text-gray-600 font-medium">Total Views</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{property.total_bookings || 0}</div>
+                    <div className="text-sm text-gray-600 font-medium">Bookings</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Info Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+              <h3 className="font-bold text-gray-900 mb-4">Need Help?</h3>
+              <p className="text-gray-600 mb-4">
+                Have questions about this property or the booking process?
+              </p>
+              <button
+                onClick={() => navigate('/contact')}
+                className="w-full bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 rounded-xl border-2 border-blue-200 transition-colors"
+              >
+                Contact Support
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Booking Modal */}
-        {showBookingModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-              <div className="bg-blue-600 text-white p-6 rounded-t-2xl flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Book This Property</h2>
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-slideUp">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Book This Property</h2>
+                  <p className="text-blue-100 opacity-90">Complete your booking request</p>
+                </div>
                 <button
                   onClick={() => setShowBookingModal(false)}
-                  className="text-white hover:text-gray-200 text-3xl font-bold"
+                  className="text-white hover:text-gray-200 text-3xl font-bold transition-colors"
                 >
                   ×
                 </button>
               </div>
+            </div>
 
-              <div className="p-6">
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <h3 className="font-bold text-gray-900 mb-2">{property.title}</h3>
-                  <p className="text-blue-600 font-bold text-xl">${property.price}/month</p>
-                  <p className="text-gray-600 text-sm mt-1">📍 {property.address}, {property.city}</p>
+            <div className="p-6">
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 mb-6 border border-gray-200">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                    <img
+                      src={allImages[0]}
+                      alt={property.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 line-clamp-2">{property.title}</h3>
+                    <p className="text-blue-600 font-bold text-xl mt-2">${property.price}/month</p>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleBooking} className="space-y-5">
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-3">
+                    Move-in Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    min={today}
+                    value={bookingData.start_date}
+                    onChange={(e) => setBookingData({...bookingData, start_date: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all"
+                  />
                 </div>
 
-                <form onSubmit={handleBooking} className="space-y-4">
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">
-                      Move-in Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      min={today}
-                      value={bookingData.start_date}
-                      onChange={(e) => setBookingData({...bookingData, start_date: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-3">
+                    Expected End Date
+                  </label>
+                  <input
+                    type="date"
+                    min={bookingData.start_date || today}
+                    value={bookingData.end_date}
+                    onChange={(e) => setBookingData({...bookingData, end_date: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Optional - Leave empty for long-term rental</p>
+                </div>
 
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">
-                      Expected End Date
-                    </label>
-                    <input
-                      type="date"
-                      min={bookingData.start_date || today}
-                      value={bookingData.end_date}
-                      onChange={(e) => setBookingData({...bookingData, end_date: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Optional - Leave empty for long-term rental</p>
-                  </div>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-3">
+                    Message to Owner
+                  </label>
+                  <textarea
+                    rows="4"
+                    value={bookingData.message}
+                    onChange={(e) => setBookingData({...bookingData, message: e.target.value})}
+                    placeholder="Tell the owner about yourself and your requirements..."
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all resize-none"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">
-                      Message to Owner
-                    </label>
-                    <textarea
-                      rows="4"
-                      value={bookingData.message}
-                      onChange={(e) => setBookingData({...bookingData, message: e.target.value})}
-                      placeholder="Introduce yourself and mention any special requirements..."
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowBookingModal(false)}
-                      className="flex-1 bg-white hover:bg-gray-100 text-gray-700 font-semibold py-3 rounded-lg border-2 border-gray-300 transition-all"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-lg transition-all"
-                    >
-                      {property.instant_booking ? 'Confirm Booking' : 'Send Request'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                <div className="flex gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowBookingModal(false)}
+                    className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl border-2 border-gray-300 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg transition-all"
+                  >
+                    {property.instant_booking ? 'Confirm Booking' : 'Send Request'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        )}
-      </div>
-    </>
+        </div>
+      )}
+    </div>
   );
 };
 

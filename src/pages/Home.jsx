@@ -6,6 +6,10 @@ import { FaLocationDot } from "react-icons/fa6";
 
 import { useAuth } from "../context/AuthContext";
 
+import { propertyAPI } from "../services/api";
+
+import PropertyCard from "../pages/Properties/PropertyCard";
+
 import FAQ from "../pages/FAQ";
 
 const Home = () => {
@@ -360,122 +364,71 @@ const Home = () => {
             ))}
           </div>
         ) : properties.length > 0 ? (
-          // ✅ NO .slice() - 8 data comes from bacend
+          // ✅ NO .slice() - 8 data comes from backend
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+            {properties.map((p) => (
+              <PropertyCard key={p.id} property={p} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 sm:py-16">
+            <div className="text-4xl mb-4">🏠</div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-600 mb-2">No properties found</h3>
+            <p className="text-gray-500">Try adjusting your filters or check back later for new listings.</p>
+          </div>
+        )}
+      </section>
 
-   {/* 5. NEW ARRIVALS */}
+      {/* 6. WHO IS THIS FOR */}
 
-<section className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-4 md:py-6">
+      <section className="py-16 px-4 sm:px-6 lg:px-20 bg-[#F7FAFC]">
+        <div className="max-w-7xl mx-auto text-center">
+          
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-12 text-gray-900">
+            Who is this for?
+          </h2>
 
- <div className="relative mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
 
-  {/* Center Title */}
-  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1A2B3C] text-center">
-    Recently Added
-  </h2>
+            {/* Card 1 */}
+            <div className="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
+              <div className="text-5xl mb-3">🎓</div>
+              <p className="text-2xl font-bold mb-2">Students</p>
+              <p className="text-gray-500 text-sm sm:text-base">
+                Properties near colleges with budget-friendly options.
+              </p>
+            </div>
 
-  {/* Center underline */}
-  <div className="w-14 h-1 bg-[#00BFA5] mx-auto mt-3 rounded-full"></div>
+            {/* Card 2 */}
+            <div className="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
+              <div className="text-5xl mb-3">👨‍💼</div>
+              <p className="text-2xl font-bold mb-2">Professionals</p>
+              <p className="text-gray-500 text-sm sm:text-base">
+                Quiet neighborhoods with parking and convenient amenities.
+              </p>
+            </div>
 
-  {/* Right Side Link */}
-  <Link
-    to="/allproperties"
-    className="group absolute right-0 top-1/2 -translate-y-1/2
-               text-[#1A2B3C] font-bold flex items-center gap-2
-               hover:text-[#00BFA5] transition-colors text-sm sm:text-base"
-  >
-    Explore All Listings
-    <span className="group-hover:translate-x-2 transition-transform">→</span>
-  </Link>
+            {/* Card 3 */}
+            <div className="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
+              <div className="text-5xl mb-3">👨‍👩‍👧</div>
+              <p className="text-2xl font-bold mb-2">Families</p>
+              <p className="text-gray-500 text-sm sm:text-base">
+                Safe, spacious homes ideal for families.
+              </p>
+            </div>
 
-</div>
+            {/* Card 4 */}
+            <div className="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
+              <div className="text-5xl mb-3">🧳</div>
+              <p className="text-2xl font-bold mb-2">New in City</p>
+              <p className="text-gray-500 text-sm sm:text-base">
+                Trusted and verified listings for a smooth start.
+              </p>
+            </div>
 
- 
-
-  {loading ? (
-
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
-
-      {[1, 2, 3].map(i => (
-
-        <div key={i} className="h-64 sm:h-80 md:h-96 bg-gray-100 rounded-2xl sm:rounded-3xl animate-pulse" />
-
-      ))}
-
-    </div>
-
-  ) : properties.length > 0 ? (
-
-    // ✅ NO .slice() - 8 data comes from bacend
-
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
-
-      {properties.map((p) => <PropertyCard key={p.id} property={p} />)}
-
-    </div>
-
-  ) : (
-
-    <div className="text-center py-12 sm:py-16">
-
-      <div className="text-4xl mb-4">🏠</div>
-
-      <h3 className="text-lg sm:text-xl font-bold text-gray-600 mb-2">No properties found</h3>
-
-      <p className="text-gray-500">Try adjusting your filters or check back later for new listings.</p>
-
-    </div>
-
-  )}
-
-</section>
-<section class="py-16 px-4 sm:px-6 lg:px-20 bg-[#F7FAFC]">
-  <div class="max-w-7xl mx-auto text-center">
-    
-    <h2 class="text-3xl sm:text-4xl font-extrabold mb-12 text-gray-900">
-      Who is this for?
-    </h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-
-      {/* <!-- Card 1 --> */}
-      <div class="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
-        <div class="text-5xl mb-3">🎓</div>
-        <p class="text-2xl font-bold mb-2">Students</p>
-        <p class="text-gray-500 text-sm sm:text-base">
-          Properties near colleges with budget-friendly options.
-        </p>
-      </div>
-
-      {/* <!-- Card 2 --> */}
-      <div class="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
-        <div class="text-5xl mb-3">👨‍💼</div>
-        <p class="text-2xl font-bold mb-2">Professionals</p>
-        <p class="text-gray-500 text-sm sm:text-base">
-          Quiet neighborhoods with parking and convenient amenities.
-        </p>
-      </div>
-
-      {/* <!-- Card 3 --> */}
-      <div class="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
-        <div class="text-5xl mb-3">👨‍👩‍👧</div>
-        <p class="text-2xl font-bold mb-2">Families</p>
-        <p class="text-gray-500 text-sm sm:text-base">
-          Safe, spacious homes ideal for families.
-        </p>
-      </div>
-
-      {/* <!-- Card 4 --> */}
-      <div class="bg-white px-8 py-6 rounded-3xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 w-full max-w-[360px] flex flex-col items-center text-center">
-        <div class="text-5xl mb-3">🧳</div>
-        <p class="text-2xl font-bold mb-2">New in City</p>
-        <p class="text-gray-500 text-sm sm:text-base">
-          Trusted and verified listings for a smooth start.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
+          </div>
+        </div>
+      </section>
 
 
  
@@ -564,48 +517,17 @@ const Home = () => {
           <div className="flex items-center gap-4">
 
             <div className="w-12 h-12 rounded-full bg-gray-100" />
-
-          <div className="absolute -top-36 -right-36 w-[480px] h-[480px] bg-[#00BFA5]/20 rounded-full blur-[160px] animate-pulse" />
-
-          <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#00BFA5]/10 rounded-full blur-[120px] animate-pulse" />
-
-          <div className="relative z-10">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6 tracking-tight">
-              List Your Property <br />
-              <span className="text-[#00BFA5]">For Free</span>
-            </h2>
-
-            <p className="text-white/75 text-base sm:text-lg max-w-xl mx-auto mb-12">
-              Reach thousands of verified tenants and manage listings
-              effortlessly — no brokers, no hidden charges.
-            </p>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Link
-                to={isAuthenticated ? "/post-ad" : "/login"}
-                state={!isAuthenticated ? { from: "/post-ad" } : null}
-                className="bg-[#00BFA5] text-[#1A2B3C] px-12 py-4 rounded-3xl font-extrabold text-lg hover:scale-105 hover:shadow-xl transition-transform shadow-[#00BFA5]/50"
-              >
-                Start Listing Now
-              </Link>
-
-              <Link
-                to="/how-it-works"
-                className="bg-white/10 text-white border border-white/20 px-12 py-4 rounded-3xl font-bold text-lg hover:bg-white/20 hover:backdrop-brightness-125 transition-all backdrop-blur-md"
-              >
-                Learn More
-              </Link>
+            <div>
+              <p className="font-bold text-gray-900">Happy User</p>
+              <p className="text-sm text-gray-500">Verified Tenant</p>
             </div>
           </div>
         </div>
-
       ))}
-
     </div>
-
   </div>
-
 </section>
+
 <section className="relative max-w-6xl mt-10 mx-auto px-4 sm:px-6 pb-16 md:pb-16">
 
   {/* Soft Outer Glow */}
